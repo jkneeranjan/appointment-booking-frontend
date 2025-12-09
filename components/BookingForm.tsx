@@ -42,7 +42,7 @@ export const BookingForm = () => {
 
     try {
       // Call Node.js backend API (appointment-backend-production-9504.up.railway.app)
-      const response = await fetch('https://appointment-backend-production-9504.up.railway.app/api/book-appointment', {
+      const response = await fetch('https://appointment-backend-production-b508.up.railway.app/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
