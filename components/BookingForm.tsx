@@ -25,7 +25,6 @@ export const BookingForm = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     const val = e.target.type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
-
     setFormData(prev => ({ ...prev, [name]: val }));
   };
 
@@ -40,25 +39,26 @@ export const BookingForm = () => {
       return;
     }
 
+    const body = JSON.stringify({
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      phone: formData.phone,
+      dob: formData.dob,
+      preferredDate: formData.date,
+      preferredSlot: formData.time,
+      reason: formData.reason,
+      insurance: formData.insurance,
+      notes: formData.message
+    });
+
+    console.log('Booking payload:', body); // <-- debug helper
+
     try {
-      // Call Node.js backend API (appointment-backend-production-9504.up.railway.app)
-      const response = await fetch('https://appointment-backend-production-b508.up.railway.app/', {
+      const response = await fetch('https://appointment-backend-production-b508.up.railway.app/api/book-appointment', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          phone: formData.phone,
-          dob: formData.dob,                    // Send as yyyy-mm-dd (native format)
-          preferredDate: formData.date,          // Send as yyyy-mm-dd (native format)
-          preferredSlot: formData.time,
-          reason: formData.reason,
-          insurance: formData.insurance,
-          notes: formData.message
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body
       });
 
       const result = await response.json();
@@ -98,21 +98,13 @@ export const BookingForm = () => {
             : 'Thank you for your appointment request. We have sent a confirmation email and will contact you shortly.'}
         </p>
         <button
-          onClick={() => { 
-            setSubmitted(false); 
-            setStep(1); 
+          onClick={() => {
+            setSubmitted(false);
+            setStep(1);
             setFormData({
-              firstName: '',
-              lastName: '',
-              email: '',
-              phone: '',
-              dob: '',
-              reason: 'Initial Consultation',
-              insurance: 'Statutory Health Insurance',
-              date: '',
-              time: '',
-              message: '',
-              consent: false
+              firstName: '', lastName: '', email: '', phone: '', dob: '',
+              reason: 'Initial Consultation', insurance: 'Statutory Health Insurance',
+              date: '', time: '', message: '', consent: false
             });
           }}
           className="bg-slate-900 text-white px-8 py-3 rounded-full hover:bg-slate-800 transition-colors"
@@ -130,7 +122,6 @@ export const BookingForm = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="p-8 md:p-12 space-y-8">
-
         {/* Personal Details */}
         <div className="space-y-6">
           <h3 className="text-lg font-medium text-slate-900 border-b pb-2">1. {language === 'de' ? 'Persönliche Daten' : 'Personal Details'}</h3>
@@ -191,11 +182,11 @@ export const BookingForm = () => {
               <div className="relative">
                 <Clock className="absolute left-3 top-3 text-slate-400" size={20} />
                 <select required name="time" value={formData.time} onChange={handleChange} className="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all outline-none bg-white text-slate-900">
-                   <option value="">{language === 'de' ? 'Zeit wählen...' : 'Select time...'}</option>
-                   <option value="08:00">08:00 - 10:00</option>
-                   <option value="10:00">10:00 - 12:00</option>
-                   <option value="13:00">13:00 - 15:00</option>
-                   <option value="15:00">15:00 - 17:00</option>
+                  <option value="">{language === 'de' ? 'Zeit wählen...' : 'Select time...'}</option>
+                  <option value="08:00">08:00 - 10:00</option>
+                  <option value="10:00">10:00 - 12:00</option>
+                  <option value="13:00">13:00 - 15:00</option>
+                  <option value="15:00">15:00 - 17:00</option>
                 </select>
               </div>
             </div>
@@ -209,9 +200,7 @@ export const BookingForm = () => {
         {/* Consent */}
         <div className="flex items-start">
           <input required type="checkbox" name="consent" checked={formData.consent} onChange={(e) => setFormData({...formData, consent: e.target.checked})} className="mt-1 h-5 w-5 text-emerald-600 focus:ring-emerald-500 border-slate-300 rounded" />
-          <span className="ml-3 text-sm text-slate-600">
-             {t('form_privacy')}
-          </span>
+          <span className="ml-3 text-sm text-slate-600">{t('form_privacy')}</span>
         </div>
 
         {error && (
@@ -227,7 +216,6 @@ export const BookingForm = () => {
           className="w-full bg-emerald-600 text-white font-semibold py-4 rounded-xl hover:bg-emerald-700 transition-colors shadow-lg hover:shadow-emerald-200/50 disabled:opacity-50 disabled:cursor-not-allowed">
           {loading ? (language === 'de' ? 'Wird gesendet...' : 'Sending...') : t('booking_submit')}
         </button>
-
       </form>
     </div>
   );
